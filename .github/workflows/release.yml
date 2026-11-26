@@ -1,0 +1,56 @@
+# Builds Vencord with this plugin included and publishes it as a release, so people can install it
+# without building anything. Runs when a version tag (v1.0.0, ...) is pushed, or by hand.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - uses: actions/checkout@v4
+        with:
+          repository: Vendicated/Vencord
+          path: vencord
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: vencord/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: vencord/pnpm-lock.yaml
+
+      - name: Build Vencord with XMedia
+        working-directory: vencord
+        run: |
+          mkdir -p src/userplugins
+          cp -r ../plugin/src src/userplugins/xMedia
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Package
+        run: |
+          # Only what Discord's own app loads, to drop into %APPDATA%\Vencord\dist. vencordDesktop*
+          # is the Vesktop build, and the LEGAL files are the license notices of the libraries
+          # bundled into the scripts.
+          cd vencord/dist
+          zip -q ../../XMedia.zip patcher.js preload.js renderer.js renderer.css patcher.js.LEGAL.txt renderer.js.LEGAL.txt
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: XMedia.zip
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('build-{0}', github.run_number) }}
+          prerelease: ${{ github.ref_type != 'tag' }}
