@@ -7,8 +7,8 @@ original files.
 /x https://x.com/i/status/2125585555589407186
 ```
 
-A video is posted in its highest quality. A GIF is posted as an MP4, because X converts every GIF
-and keeps no GIF file. Posts that X only shows to logged-in users (age-restricted, private accounts)
+A video is posted in its highest quality. A GIF is converted back to a GIF file with ffmpeg, because X turns every GIF into an MP4
+(without ffmpeg, or if the GIF would be over 10 MB, the MP4 is posted). Posts that X only shows to logged-in users (age-restricted, private accounts)
 don't work.
 
 ## Setup

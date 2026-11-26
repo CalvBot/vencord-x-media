@@ -22,6 +22,11 @@ const settings = definePluginSettings({
         description: "Post the files at once. When off, they are added to your message for you to send.",
         default: true,
     },
+    realGifs: {
+        type: OptionType.BOOLEAN,
+        description: "Post a GIF as a GIF file. X only has GIFs as MP4 videos, so this converts them (needs ffmpeg, and the file is larger). When off, the MP4 is posted.",
+        default: true,
+    },
 });
 
 /** The post id in a link to X (x.com, twitter.com and the embed-fixing copies), or a bare id */
@@ -54,8 +59,10 @@ export default definePlugin({
                 if (!media.length) return say("That post has no video, GIF or image.");
                 const files: File[] = [];
                 for (const m of media) {
-                    const data = await Native.download(m.url) as Uint8Array<ArrayBuffer>;
-                    files.push(new File([data], m.name, { type: m.type }));
+                    const got = await Native.download(m.url, m.gif && settings.store.realGifs);
+                    files.push(got.gif
+                        ? new File([got.data as Uint8Array<ArrayBuffer>], m.name.replace(/[.]mp4$/, ".gif"), { type: "image/gif" })
+                        : new File([got.data as Uint8Array<ArrayBuffer>], m.name, { type: m.type }));
                 }
                 // After the command has finished: Discord clears the message box then, attachments included.
                 // requireConfirm:false is Discord's instant-upload path, which sends with its own progress bar.
