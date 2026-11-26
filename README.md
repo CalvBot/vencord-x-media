@@ -9,22 +9,15 @@ original files.
 
 ## Setup
 
-Vencord has no way to load a plugin file, so the plugin is built into your own copy of Vencord.
-You need [git](https://git-scm.com/), [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/installation).
+1. Install [Vencord](https://vencord.dev/download/) and open Discord once.
+2. Download and run the
+   [Vencord Plugin Installer](https://github.com/CalvBot/vencord-plugin-installer/releases/latest),
+   tick **XMedia** and click Install.
 
-```sh
-git clone https://github.com/Vendicated/Vencord
-git clone https://github.com/CalvBot/vencord-x-media
-cd Vencord
-mkdir -p src/userplugins
-cp -r ../vencord-x-media/src src/userplugins/xMedia
-pnpm install --frozen-lockfile
-pnpm build
-pnpm inject
-```
+It builds Vencord with the plugin on your own PC and switches it on. Run it again to update.
 
-Quit Discord fully before `pnpm inject`, then open it and enable **XMedia** in Vencord's plugin
-settings. To update, pull both folders, copy `src` again and run `pnpm build`.
+To build it yourself, copy `src` into a Vencord source checkout as `src/userplugins/xMedia` and
+build Vencord.
 
 ## What gets posted
 
